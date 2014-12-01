@@ -12,7 +12,6 @@
     	$response->send();
     	die();
 	}
-	echo sprintf('Your token is!!');
-	print_r($token);
+	echo json_encode($token);
 
 ?>

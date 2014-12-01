@@ -27,6 +27,7 @@
 	  'basic',
 	  'balance',
 	  'request_transfer',
+	  'execute_transfer'
 	);
 	$memory = new OAuth2\Storage\Memory(array(
 	  'default_scope' => $defaultScope,
