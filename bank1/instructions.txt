@@ -1,0 +1,8 @@
+Create authorization code
+http://10.0.0.19/authorize.php?response_type=code&client_id=financial_aggregator&state=xyz&scope=balance
+
+Get the token starting from the access code
+curl -u financial_aggregator:115ec9855f http://10.0.0.19/token.php -d 'grant_type=authorization_code&code=e1f0e2305ff48f74e2475255dd0e0c5d3a143162'
+
+Get access to a resource:
+access_token = 5c484db0dea852a52b17beaf096673c41c0e2333
