@@ -3,13 +3,13 @@
 	require_once __DIR__.'/server.php';
 
 	// Start the session
+	session_set_cookie_params(86400, "/bank1");
 	session_start();
 
 	echo "<!DOCTYPE html>";
 	echo "<html>";
 	echo "<body>";
 
-	// logout
 	if(isset($_POST["logout"])) {
 		// remove all session variables
 		session_unset(); 
@@ -40,6 +40,10 @@
 		// display an authorization form
 		echo "<form method='POST'>";
 		echo "<input type='submit' name='authorized' value='authorized'>";
+		echo "</form>";
+
+		echo "<form method='POST'>";
+		echo "<input type='submit' name='logout' value='logout'>";
 		echo "</form>";
 		die();
 	}

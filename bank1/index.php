@@ -3,6 +3,7 @@
 	require_once __DIR__.'/server.php';
 
 	// Start the session
+	session_set_cookie_params(86400, "/bank1");
 	session_start();
 
 	echo "<!DOCTYPE html>";

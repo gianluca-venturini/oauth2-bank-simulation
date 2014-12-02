@@ -43,7 +43,7 @@
 	$newBalance = $fromAccount["balance"] - $amount;
 	$db->accounts->update(array("username" => $fromUser), array('$set' => array("balance" => $newBalance)));
 
-	$newBalance = $fromAccount["balance"] + $amount;
+	$newBalance = $toAccount["balance"] + $amount;
 	$db->accounts->update(array("username" => $toUser), array('$set' => array("balance" => $newBalance)));
 
 	echo json_encode(array('success' => true, 'from_user' => $fromUser, 'to_user' => $toUser, 'amount' => $amount));

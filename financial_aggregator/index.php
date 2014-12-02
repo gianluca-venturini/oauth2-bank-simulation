@@ -3,13 +3,12 @@
 	require_once __DIR__.'/server.php';
 
 	// Start the session
+	session_set_cookie_params(86400, "/financial_aggregator");
 	session_start();
 
 	echo "<!DOCTYPE html>";
 	echo "<html>";
 	echo "<body>";
-
-	print_r($banks);
 
 	// logout
 	if(isset($_POST["logout"])) {
@@ -37,12 +36,74 @@
 		die();
 	}
 
-	$bank = $db->accounts->findOne(array("username" => $_SESSION["username"]))["bank"];
-	$bankToken = $db->accounts->findOne(array("username" => $_SESSION["username"]))["bank_token"];
+	@$bank = $db->accounts->findOne(array("username" => $_SESSION["username"]))["bank"];
+	@$bankToken = $db->accounts->findOne(array("username" => $_SESSION["username"]))["bank_token"];
 
 	if(isset($bank)) {
+		// Search the bank urls
+		$balanceUrl = null;
+		$transferUrl = null;
+		foreach($banks as $b) {
+			if($b["bank"] == $bank) {
+				$balanceUrl = $b["balanceUrl"];
+				$transferUrl = $b["transferUrl"];
+			}
+		}
+
+		if($balanceUrl != null && $transferUrl != null) {
+
+			// Request the balance from the bank
+			$ch = curl_init("http://127.0.0.1".$balanceUrl); 
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, "access_token=".$bankToken);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);	// Return the trasfer as a string
+			$output = curl_exec($ch); 						// Execute the operation
+			curl_close($ch);
+
+			$balance = json_decode($output, true)["balance"];
+			$owner = json_decode($output, true)["username"];
+			echo "Owner of the account: $owner<br>";
+			echo "Balance: $balance<br>";
+
+			// transfer money
+			if(isset($_POST["transfer"])) {
+
+				// Lookup for the user in the DB
+				$toUserAccount = $db->accounts->findOne(array("username" => $_POST["to_user"]));
+				if(count($toUserAccount) > 0 && isset($toUserAccount["bank_username"])) {
+
+					$toUser = $toUserAccount["bank_username"];
+					$fromUser = $owner;
+					$amount = $_REQUEST["amount"];
+
+					// Transfer money with the bank
+					$ch = curl_init("http://127.0.0.1".$transferUrl); 
+					curl_setopt($ch, CURLOPT_POST, 4);
+					curl_setopt($ch, CURLOPT_POSTFIELDS, "access_token=$bankToken&".
+														 "from_user=$fromUser&".
+														 "to_user=$toUser&".
+														 "amount=$amount");
+					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);	// Return the trasfer as a string
+					$output = curl_exec($ch); 						// Execute the operation
+					curl_close($ch);
+
+					print_r($output);
+				}
+			}
+		}
+
 		echo "Bank: $bank<br>";
-		echo "Bank: $bank_token";
+		echo "<form method='POST' action='remove_card.php'>";
+			echo "<input type='submit' value='remove card'>";
+		echo "</form>";
+
+		echo "Make a transfer<br>";
+		echo "<form method='POST'>";
+			echo "to user: <input type='text' value='' name='to_user'><br>";
+			echo "amount: <input type='text' value='' name='amount'>";
+			echo "<input type='hidden' name='transfer' value='yes'>";
+			echo "<input type='submit' value='transfer money'>";
+		echo "</form>";
 	}
 	else {
 		echo "<form method='GET' action='add_card.php'>";
@@ -83,6 +144,10 @@
 	echo "<form method='POST'>";
 		echo "<input type='submit' value='logout'>";
 		echo "<input type='hidden' value='true' name='logout'>";
+	echo "</form>";
+
+	echo "<form method='POST'>";
+		echo "<input type='submit' value='refresh'>";
 	echo "</form>";
 
 	echo "</body>";
