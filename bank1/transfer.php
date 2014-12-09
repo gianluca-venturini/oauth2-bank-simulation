@@ -32,7 +32,6 @@
 	}
 
 	$fromAccount = $db->accounts->findOne(array("username" => $fromUser));
-	$toAccount = $db->accounts->findOne(array("username" => $toUser));
 
 	if($fromAccount["balance"] < $amount) {
 		echo json_encode(array('success' => false, 'from_user' => $fromUser, 'to_user' => $toUser, 'amount' => $amount, 'reason' => 'insufficient founds'));
@@ -42,6 +41,8 @@
 	// Update the two accounts
 	$newBalance = $fromAccount["balance"] - $amount;
 	$db->accounts->update(array("username" => $fromUser), array('$set' => array("balance" => $newBalance)));
+
+	$toAccount = $db->accounts->findOne(array("username" => $toUser));
 
 	$newBalance = $toAccount["balance"] + $amount;
 	$db->accounts->update(array("username" => $toUser), array('$set' => array("balance" => $newBalance)));
