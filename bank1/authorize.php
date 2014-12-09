@@ -1,14 +1,13 @@
 <?php
 	// include our OAuth2 Server object
 	require_once __DIR__.'/server.php';
+	require_once __DIR__.'/view.php';
 
 	// Start the session
 	session_set_cookie_params(86400, "/bank1");
 	session_start();
 
-	echo "<!DOCTYPE html>";
-	echo "<html>";
-	echo "<body>";
+	printHeader();
 
 	if(isset($_POST["logout"])) {
 		// remove all session variables
@@ -27,24 +26,35 @@
 	}
 
 	if(!isset($_SESSION["username"])) {
+		printLoginForm();
+		/*
 		echo "<form method='POST'>";
 		echo "<input type='text' name='username'>";
 		echo "<input type='text' name='password'>";
 		echo "<input type='submit' value='login'>";
 		echo "</form>";
+		*/
 		die();
 	}
 
 	$authorized = false;
 	if(!isset($_POST["authorized"])) {
 		// display an authorization form
+		printAuthorize();
+
+		/*
 		echo "<form method='POST'>";
 		echo "<input type='submit' name='authorized' value='authorized'>";
 		echo "</form>";
+		*/
 
+		printLogout();
+
+		/*
 		echo "<form method='POST'>";
 		echo "<input type='submit' name='logout' value='logout'>";
 		echo "</form>";
+		*/
 		die();
 	}
 	else {
@@ -71,6 +81,9 @@
 	}
 	$response->send();
 
+	printFooter();
+	/*
 	echo "</body>";
 	echo "</html>";
+	*/
 ?>

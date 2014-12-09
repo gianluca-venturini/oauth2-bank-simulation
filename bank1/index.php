@@ -1,14 +1,13 @@
 <?php 
 
 	require_once __DIR__.'/server.php';
+	require_once __DIR__.'/view.php';
 
 	// Start the session
 	session_set_cookie_params(86400, "/bank1");
 	session_start();
 
-	echo "<!DOCTYPE html>";
-	echo "<html>";
-	echo "<body>";
+	printHeader();
 
 	// logout
 	if(isset($_POST["logout"])) {
@@ -28,17 +27,21 @@
 	}
 
 	if(!isset($_SESSION["username"])) {
+		printLoginForm();
+		/*
 		echo "<form method='POST'>";
 		echo "<input type='text' name='username'>";
 		echo "<input type='text' name='password'>";
 		echo "<input type='submit' value='login'>";
 		echo "</form>";
+		*/
+		
 		die();
 	}
 
 	$balance = $db->accounts->findOne(array("username" => $_SESSION["username"]))["balance"];
 
-	echo "Balance: $balance";
+	printBalance($_SESSION["username"], $balance);
 
 
 	/*
@@ -68,12 +71,13 @@
 	$storage->setClientDetails($client_id, $client_secret, $redirect_uri);
 	*/
 
+/*
 	echo "<form method='POST'>";
 		echo "<input type='submit' value='logout'>";
 		echo "<input type='hidden' value='true' name='logout'>";
 		echo "</form>";
+		*/
 
-	echo "</body>";
-	echo "</html>";
+	printFooter();
 	
 ?>

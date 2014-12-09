@@ -1,14 +1,13 @@
 <?php 
 
 	require_once __DIR__.'/server.php';
+	require_once __DIR__.'/view.php';
 
 	// Start the session
 	session_set_cookie_params(86400, "/financial_aggregator");
 	session_start();
 
-	echo "<!DOCTYPE html>";
-	echo "<html>";
-	echo "<body>";
+	printHeader();
 
 	// logout
 	if(isset($_POST["logout"])) {
@@ -28,11 +27,14 @@
 	}
 
 	if(!isset($_SESSION["username"])) {
+		printLogin();
+		/*
 		echo "<form method='POST'>";
 		echo "<input type='text' name='username'>";
 		echo "<input type='text' name='password'>";
 		echo "<input type='submit' value='login'>";
 		echo "</form>";
+		*/
 		die();
 	}
 
@@ -62,8 +64,8 @@
 
 			$balance = json_decode($output, true)["balance"];
 			$owner = json_decode($output, true)["username"];
-			echo "Owner of the account: $owner<br>";
-			echo "Balance: $balance<br>";
+			//echo "Owner of the account: $owner<br>";
+			//echo "Balance: $balance<br>";
 
 			// transfer money
 			if(isset($_POST["transfer"])) {
@@ -84,19 +86,33 @@
 														 "to_user=$toUser&".
 														 "amount=$amount");
 					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);	// Return the trasfer as a string
-					$output = curl_exec($ch); 						// Execute the operation
+					$output = json_decode(curl_exec($ch), true); 						// Execute the operation
 					curl_close($ch);
 
-					print_r($output);
+					if($output["success"] != "true") {
+						printError("Transaction refused from bank");
+					}
+					else {
+						printSuccess();
+					}
+					//print_r($output);
+				}
+				else {
+					printError("User not present or no active card connected");
 				}
 			}
 		}
 
+		/*
 		echo "Bank: $bank<br>";
 		echo "<form method='POST' action='remove_card.php'>";
 			echo "<input type='submit' value='remove card'>";
 		echo "</form>";
+		*/
 
+		printTransfer($owner, $balance, $bank);
+
+		/*
 		echo "Make a transfer<br>";
 		echo "<form method='POST'>";
 			echo "to user: <input type='text' value='' name='to_user'><br>";
@@ -104,11 +120,15 @@
 			echo "<input type='hidden' name='transfer' value='yes'>";
 			echo "<input type='submit' value='transfer money'>";
 		echo "</form>";
+		*/
 	}
 	else {
+		printAddCard();
+		/*
 		echo "<form method='GET' action='add_card.php'>";
 			echo "<input type='submit' name='bank' value='citybank'>";
 		echo "</form>";
+		*/
 	}
 
 	
@@ -140,17 +160,23 @@
 	$redirect_uri = "http://10.0.0.4:1234";
 	$storage->setClientDetails($client_id, $client_secret, $redirect_uri);
 	*/
+	printLogout();
+	/*
 
 	echo "<form method='POST'>";
 		echo "<input type='submit' value='logout'>";
 		echo "<input type='hidden' value='true' name='logout'>";
 	echo "</form>";
+	*/
 
+	printRefresh();
+
+	/*
 	echo "<form method='POST'>";
 		echo "<input type='submit' value='refresh'>";
 	echo "</form>";
+	*/
 
-	echo "</body>";
-	echo "</html>";
+	printFooter();
 	
 ?>
