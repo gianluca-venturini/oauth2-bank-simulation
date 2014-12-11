@@ -14,7 +14,7 @@
 			    <meta name="author" content="">
 			    <link rel="icon" href="http://getbootstrap.com/favicon.ico">
 
-			    <title>Paypal</title>
+			    <title>Citibank</title>
 
 			    <!-- Bootstrap core CSS -->
 			    <link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">

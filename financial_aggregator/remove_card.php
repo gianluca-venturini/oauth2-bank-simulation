@@ -13,7 +13,7 @@
 
 	$username = $_SESSION["username"];
 
-	$db->accounts->update(array("username" => $username), array('$unset' => array("bank" => "", "bank_token" => "")));
+	$db->accounts->update(array("username" => $username), array('$unset' => array("bank" => "", "bank_token" => "", "bank_username" => "")));
 
 	header('Location: '."./");
 
